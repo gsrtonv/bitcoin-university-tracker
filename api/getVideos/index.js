@@ -1,4 +1,5 @@
 module.exports = async function (context, req) {
+<<<<<<< HEAD
   try {
     const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
     const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
@@ -55,4 +56,14 @@ module.exports = async function (context, req) {
       body: "Server error: " + error.message
     };
   }
+=======
+  context.log("getVideos function started");
+  context.res = {
+    status: 200,
+    body: {
+      message: "Function is running",
+      timestamp: new Date().toISOString()
+    }
+  };
+>>>>>>> 271985432624cf785bf92eb8fc6cd918975ac8d7
 };
