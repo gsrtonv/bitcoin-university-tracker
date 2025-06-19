@@ -5,15 +5,20 @@ module.exports = async function (context, req) {
     const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
     const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 
+    context.log("Starting getVideos function...");
+    context.log("API Key present:", !!YOUTUBE_API_KEY);
+    context.log("Channel ID:", CHANNEL_ID);
+
     if (!YOUTUBE_API_KEY || !CHANNEL_ID) {
       context.res = {
         status: 500,
-        body: "Missing API key or channel ID environment variables"
+        body: "Missing YOUTUBE_API_KEY or YOUTUBE_CHANNEL_ID"
       };
       return;
     }
 
-    // Step 1: Get uploads playlist ID
+    // Fetch uploads playlist ID
+    context.log("Fetching uploads playlist ID...");
     const channelRes = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${YOUTUBE_API_KEY}`
     );
@@ -23,12 +28,13 @@ module.exports = async function (context, req) {
     if (!uploadsPlaylistId) {
       context.res = {
         status: 500,
-        body: "Failed to extract uploads playlist ID"
+        body: "Could not retrieve uploads playlist ID"
       };
       return;
     }
 
-    // Step 2: Get playlist videos
+    // Fetch videos from playlist
+    context.log("Fetching videos from playlist...");
     const playlistRes = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=10&playlistId=${uploadsPlaylistId}&key=${YOUTUBE_API_KEY}`
     );
@@ -36,7 +42,8 @@ module.exports = async function (context, req) {
 
     const videoIds = playlistData.items.map(item => item.snippet.resourceId.videoId).join(',');
 
-    // Step 3: Get durations
+    // Fetch video durations
+    context.log("Fetching video durations...");
     const videoStatsRes = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`
     );
@@ -51,11 +58,11 @@ module.exports = async function (context, req) {
       body: playlistData
     };
 
-  } catch (err) {
-    context.log("ERROR:", err);
+  } catch (error) {
+    context.log("ERROR:", error.message);
     context.res = {
       status: 500,
-      body: "Server error: " + err.message
+      body: "Server error: " + error.message
     };
   }
 };
