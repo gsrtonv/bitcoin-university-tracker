@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Channel Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #ff3d00;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background-color: #292929;
+      color: #ffccbc;
+      font-weight: bold;
+    }
+
+    td a {
+      color: #1e90ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    tr:hover {
+      background-color: #2c2c2c;
+    }
+
+    img {
+      width: 100px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>YouTube Channel Tracker</h1>
+  <table id="videos-table">
+    <thead>
+      <tr>
+        <th>Thumbnail</th>
+        <th>Title</th>
+        <th>Published Date</th>
+        <th>Description</th>
+        <th>Duration</th>
+        <th>Views</th>
+        <th>Likes</th>
+        <th>Watch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Video rows go here -->
+    </tbody>
+  </table>
+
+  <script src="app.js"></script>
+</body>
+</html>
