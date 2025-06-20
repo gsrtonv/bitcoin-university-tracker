@@ -20,7 +20,8 @@ module.exports = async function (context, req) {
       publishedAt: new Date(snippet.publishedAt).toLocaleString(),
       description: snippet.description,
       thumbnail: snippet.thumbnails?.default?.url || "",
-      url: `https://www.youtube.com/watch?v=${snippet.resourceId.videoId}`
+      url: `https://www.youtube.com/watch?v=${snippet.resourceId.videoId}`,
+      summary: "Key points will be added soon."
     };
   });
 

@@ -21,6 +21,7 @@
     .accordion th, .accordion td {
       border: 1px solid #333;
       padding: 0.5rem;
+      vertical-align: top;
     }
     .accordion td img {
       max-width: 100px;
@@ -56,7 +57,7 @@
 
         const tableHTML = [
           '<table class="accordion">',
-          '<tr><th>Thumbnail</th><th>Title</th><th>Date</th></tr>'
+          '<tr><th>Thumbnail</th><th>Title</th><th>Date</th><th>Summary</th></tr>'
         ];
 
         videos.forEach(video => {
@@ -66,8 +67,9 @@
               <td><a href="${video.url}" target="_blank"><img src="${video.thumbnail}" alt="thumbnail"/></a></td>
               <td><a href="${video.url}" target="_blank">${video.title}</a></td>
               <td>${video.publishedAt}</td>
+              <td>${video.summary || 'N/A'}</td>
             </tr>
-            <tr class="details-row"><td colspan="3"><div class="details" id="${safeId}">${video.description}</div></td></tr>`
+            <tr class="details-row"><td colspan="4"><div class="details" id="${safeId}">${video.description}</div></td></tr>`
           );
         });
 
