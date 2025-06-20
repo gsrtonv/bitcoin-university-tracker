@@ -31,8 +31,7 @@ async function getLatestVideos() {
       detailsRow.id = `details-${index}`;
       detailsRow.innerHTML = `
         <td colspan="3">
-          <strong>Description:</strong> ${description || "N/A"}<br>
-          <strong>Video ID:</strong> ${videoId}
+          <div>${marked.parse(description || "No description available.")}</div>
         </td>
       `;
 
