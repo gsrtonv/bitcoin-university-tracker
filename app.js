@@ -1,75 +1,50 @@
-function convertDuration(iso) {
-  const matches = iso.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-  const h = matches[1] ? matches[1].replace('H', '').padStart(2, '0') : '00';
-  const m = matches[2] ? matches[2].replace('M', '').padStart(2, '0') : '00';
-  const s = matches[3] ? matches[3].replace('S', '').padStart(2, '0') : '00';
-  return `${h}:${m}:${s}`;
-}
 
 async function getLatestVideos() {
   try {
     const response = await fetch("/api/getVideos");
-    const data = await response.json();
-    const tableBody = document.querySelector("#videos-table tbody");
-    tableBody.innerHTML = "";
+    const videos = await response.json();
 
-    data.items.forEach(item => {
-      const snippet = item.snippet;
-      const videoId = snippet.resourceId.videoId || snippet.videoId;
-      const thumbnail = snippet.thumbnails.medium.url;
-      const title = snippet.title;
-      const publishedAt = new Date(snippet.publishedAt).toLocaleString();
-      const description = snippet.description.slice(0, 80) + "...";
-      const duration = item.duration ? convertDuration(item.duration) : "N/A";
+    const tbody = document.querySelector("#video-table tbody");
+    tbody.innerHTML = "";
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank"><img src="${thumbnail}" alt="Thumbnail"></a></td>
+    videos.forEach((item, index) => {
+      const { title, thumbnails, publishedAt, description, resourceId } = item.snippet;
+      const videoId = resourceId.videoId;
+
+      const mainRow = document.createElement("tr");
+      mainRow.classList.add("video-row");
+      mainRow.style.cursor = "pointer";
+      mainRow.onclick = () => {
+        const details = document.getElementById(`details-${index}`);
+        details.style.display = details.style.display === "table-row" ? "none" : "table-row";
+      };
+
+      mainRow.innerHTML = `
+        <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
+              <img class="thumbnail" src="${thumbnails.default.url}" /></a></td>
         <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">${title}</a></td>
-        <td>${publishedAt}</td>
-        <td>${description}</td>
-        <td>${duration}</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Watch</a></td>
+        <td>${new Date(publishedAt).toLocaleString()}</td>
       `;
-      tableBody.appendChild(row);
 
-      const thumbnailCell = row.querySelector("td img");
+      const detailsRow = document.createElement("tr");
+      detailsRow.classList.add("details");
+      detailsRow.id = `details-${index}`;
+      detailsRow.innerHTML = `
+        <td colspan="3">
+          <strong>Description:</strong> ${description || "N/A"}<br>
+          <strong>Video ID:</strong> ${videoId}
+        </td>
+      `;
 
-      thumbnailCell.addEventListener("mouseenter", e => {
-        const preview = document.getElementById("hover-preview");
-        const iframe = preview.querySelector("iframe");
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
-        preview.style.left = e.pageX + 20 + "px";
-        preview.style.top = e.pageY + "px";
-        preview.style.display = "block";
-      });
-
-      thumbnailCell.addEventListener("mousemove", e => {
-        const preview = document.getElementById("hover-preview");
-        preview.style.left = e.pageX + 20 + "px";
-        preview.style.top = e.pageY + "px";
-      });
-
-      thumbnailCell.addEventListener("mouseleave", () => {
-        const preview = document.getElementById("hover-preview");
-        const iframe = preview.querySelector("iframe");
-        iframe.src = "";
-        preview.style.display = "none";
-      });
+      tbody.appendChild(mainRow);
+      tbody.appendChild(detailsRow);
     });
 
     document.getElementById("last-updated").textContent =
       "Last updated: " + new Date().toLocaleString();
-
-  } catch (error) {
-    console.error("Error loading videos:", error);
-    document.querySelector("#videos-table tbody").innerHTML = `
-      <tr><td colspan="8">Failed to load videos. Check the server logs.</td></tr>
-    `;
+  } catch (err) {
+    console.error(err);
   }
 }
-
 getLatestVideos();
-setInterval(getLatestVideos, 10 * 60 * 1000);
+setInterval(getLatestVideos, 600000);
