@@ -1,63 +1,75 @@
 
-document.addEventListener("DOMContentLoaded", () => {
-  const apiUrl = "/api/getVideos";
-  const tableContainer = document.getElementById("video-table");
-  const lastUpdated = document.getElementById("last-updated");
+const tableContainer = document.getElementById("video-table");
+const lastUpdated = document.getElementById("last-updated");
 
-  function formatDate(iso) {
-    const date = new Date(iso);
-    return date.toLocaleString();
+async function fetchVideos() {
+  try {
+    const res = await fetch("/api/getVideos");
+    const data = await res.json();
+    renderTable(data.videos);
+    updateTimestamp();
+  } catch (error) {
+    tableContainer.innerHTML = "<p>Failed to load videos.</p>";
   }
+}
 
-  function toggleAccordion(e) {
-    const content = e.currentTarget.nextElementSibling;
-    content.style.display = content.style.display === "block" ? "none" : "block";
-  }
+function renderTable(videos) {
+  const rows = videos.map(video => {
+    return `
+      <tr class="video-row">
+        <td>
+          <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">
+            <img src="${video.thumbnail}" width="120"/>
+          </a>
+        </td>
+        <td>
+          <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a>
+          <br />
+          <button onclick="toggleSummary('${video.videoId}', this)">Show Summary</button>
+          <div id="summary-${video.videoId}" class="summary-box" style="display:none;"></div>
+        </td>
+        <td>${video.publishedAt}</td>
+        <td>${video.duration}</td>
+        <td>${video.views}</td>
+        <td>${video.likes}</td>
+      </tr>`;
+  }).join("");
 
-  function renderTable(videos) {
-    const table = document.createElement("table");
-    table.innerHTML = `
+  tableContainer.innerHTML = `
+    <table>
       <thead>
         <tr>
           <th>Thumbnail</th>
           <th>Title</th>
-          <th>Date</th>
+          <th>Published</th>
+          <th>Duration</th>
+          <th>Views</th>
+          <th>Likes</th>
         </tr>
       </thead>
-      <tbody>
-        ${videos.map(video => `
-          <tr class="accordion-header">
-            <td><a href="https://www.youtube.com/watch?v=${video.id}" target="_blank"><img src="${video.thumbnail}" width="120"/></a></td>
-            <td><a href="https://www.youtube.com/watch?v=${video.id}" target="_blank">${video.title}</a></td>
-            <td>${formatDate(video.publishedAt)}</td>
-          </tr>
-          <tr class="accordion-content">
-            <td colspan="3">${video.description}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    `;
-    tableContainer.innerHTML = "";
-    tableContainer.appendChild(table);
+      <tbody>${rows}</tbody>
+    </table>`;
+}
 
-    document.querySelectorAll(".accordion-header").forEach(row => {
-      row.addEventListener("click", toggleAccordion);
-    });
+function updateTimestamp() {
+  const now = new Date();
+  lastUpdated.textContent = "Last updated: " + now.toLocaleString();
+}
+
+async function toggleSummary(videoId, btn) {
+  const box = document.getElementById("summary-" + videoId);
+  if (box.style.display === "none") {
+    box.innerHTML = "Loading summary...";
+    box.style.display = "block";
+    const res = await fetch("/api/summarizeTranscript?videoId=" + videoId);
+    const data = await res.json();
+    box.innerHTML = data.summary.replace(/\n/g, "<br>");
+    btn.textContent = "Hide Summary";
+  } else {
+    box.style.display = "none";
+    btn.textContent = "Show Summary";
   }
+}
 
-  function fetchData() {
-    fetch(apiUrl)
-      .then(res => res.json())
-      .then(data => {
-        renderTable(data.videos || []);
-        lastUpdated.textContent = "Last updated: " + new Date().toLocaleTimeString();
-      })
-      .catch(err => {
-        tableContainer.textContent = "Error loading videos.";
-        console.error(err);
-      });
-  }
-
-  fetchData();
-  setInterval(fetchData, 10 * 60 * 1000); // every 10 min
-});
+fetchVideos();
+setInterval(fetchVideos, 10 * 60 * 1000); // Refresh every 10 mins

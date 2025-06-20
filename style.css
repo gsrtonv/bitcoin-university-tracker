@@ -1,32 +1,32 @@
-
 body {
   background-color: black;
   color: white;
   font-family: Arial, sans-serif;
-  padding: 20px;
+  margin: 20px;
 }
-h1 {
-  color: #fff;
-}
+
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 20px;
 }
+
 th, td {
-  padding: 12px;
-  border: 1px solid #444;
+  border: 1px solid white;
+  padding: 10px;
+  text-align: left;
 }
+
 th {
   background-color: #222;
 }
-tr:nth-child(even) {
-  background-color: #111;
+
+.summary-box {
+  margin-top: 10px;
+  font-size: 0.95em;
+  color: #ccc;
 }
-a {
-  color: #1e90ff;
-}
-.accordion-content {
-  display: none;
-  padding: 10px;
-  background-color: #222;
+
+.summary-box ul {
+  padding-left: 20px;
 }
