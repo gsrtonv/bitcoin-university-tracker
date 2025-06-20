@@ -36,6 +36,9 @@ async function getLatestVideos() {
       `;
       tableBody.appendChild(row);
     });
+	document.getElementById("last-updated").textContent =
+  "Last updated: " + new Date().toLocaleString();
+
 
   } catch (error) {
     console.error("Error loading videos:", error);
@@ -45,4 +48,7 @@ async function getLatestVideos() {
   }
 }
 
-getLatestVideos();
+getLatestVideos(); //run immediately
+
+
+setInterval(getLatestVideos, 10 * 60 * 1000); // every 10 minutes
