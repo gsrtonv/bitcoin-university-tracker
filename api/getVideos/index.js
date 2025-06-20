@@ -1,32 +1,31 @@
-
 const fetch = require("node-fetch");
 
 module.exports = async function (context, req) {
   const apiKey = process.env.YOUTUBE_API_KEY;
-  const uploadsPlaylistId = process.env.UPLOADS_PLAYLIST_ID;
+  const channelId = process.env.YOUTUBE_CHANNEL_ID;
 
-  let allVideos = [];
-  let nextPageToken = "";
+  const playlistUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${apiKey}`;
+  const playlistRes = await fetch(playlistUrl);
+  const playlistData = await playlistRes.json();
+  const uploadsId = playlistData.items[0].contentDetails.relatedPlaylists.uploads;
 
-  try {
-    do {
-      const res = await fetch(
-        `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}&pageToken=${nextPageToken}`
-      );
-      const data = await res.json();
-      allVideos.push(...data.items);
-      nextPageToken = data.nextPageToken || "";
-    } while (nextPageToken);
+  const videosUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=10&playlistId=${uploadsId}&key=${apiKey}`;
+  const videosRes = await fetch(videosUrl);
+  const videosData = await videosRes.json();
 
-    context.res = {
-      status: 200,
-      body: allVideos
+  const result = videosData.items.map(item => {
+    const snippet = item.snippet;
+    return {
+      title: snippet.title,
+      publishedAt: new Date(snippet.publishedAt).toLocaleString(),
+      description: snippet.description,
+      thumbnail: snippet.thumbnails?.default?.url || "",
+      url: `https://www.youtube.com/watch?v=${snippet.resourceId.videoId}`
     };
-  } catch (err) {
-    context.log.error("Error fetching YouTube data:", err);
-    context.res = {
-      status: 500,
-      body: { error: "Failed to fetch video data." }
-    };
-  }
+  });
+
+  context.res = {
+    headers: { "Content-Type": "application/json" },
+    body: result
+  };
 };
