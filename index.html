@@ -3,92 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Video Tracker</title>
+  <title>YouTube Tracker</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    h1 {
-      padding: 1rem;
-    }
-    .accordion {
-      width: 95%;
-      margin: 0 auto;
-      border-collapse: collapse;
-    }
-    .accordion th, .accordion td {
-      border: 1px solid #333;
-      padding: 0.5rem;
-      vertical-align: top;
-    }
-    .accordion td img {
-      max-width: 100px;
-    }
-    .details {
-      display: none;
-      padding: 0.5rem;
-      background-color: #111;
-    }
-    tr.expanded + tr.details-row .details {
-      display: block;
-    }
-    tr:hover {
-      background-color: #222;
-      cursor: pointer;
-    }
-    .updated-time {
-      margin-left: 1rem;
-      font-size: 0.9rem;
-      color: #aaa;
-    }
+    body { background: #000; color: #fff; font-family: sans-serif; padding: 2rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem; border-bottom: 1px solid #333; }
+    tr:hover { background: #111; }
+    .accordion-content { display: none; color: #ccc; padding: 0.5rem 1rem; }
+    .accordion-content.active { display: block; }
+    button { background: #222; color: #fff; border: 1px solid #444; padding: 0.5rem; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h1>YouTube Video Tracker <span class="updated-time" id="lastUpdated"></span></h1>
-  <div id="videoTable">Loading...</div>
-
-  <script>
-    async function fetchVideos() {
-      try {
-        const res = await fetch("/api/getVideos");
-        const videos = await res.json();
-
-        const tableHTML = [
-          '<table class="accordion">',
-          '<tr><th>Thumbnail</th><th>Title</th><th>Date</th><th>Summary</th></tr>'
-        ];
-
-        videos.forEach(video => {
-          const safeId = "desc-" + Math.random().toString(36).substring(7);
-          tableHTML.push(
-            `<tr class="main-row" onclick="toggleDetails('${safeId}')">
-              <td><a href="${video.url}" target="_blank"><img src="${video.thumbnail}" alt="thumbnail"/></a></td>
-              <td><a href="${video.url}" target="_blank">${video.title}</a></td>
-              <td>${video.publishedAt}</td>
-              <td>${video.summary || 'N/A'}</td>
-            </tr>
-            <tr class="details-row"><td colspan="4"><div class="details" id="${safeId}">${video.description}</div></td></tr>`
-          );
-        });
-
-        tableHTML.push("</table>");
-        document.getElementById("videoTable").innerHTML = tableHTML.join("");
-        document.getElementById("lastUpdated").textContent = `(Last updated: ${new Date().toLocaleTimeString()})`;
-      } catch (e) {
-        document.getElementById("videoTable").innerHTML = "<p>Failed to load videos.</p>";
-        console.error(e);
-      }
-    }
-
-    function toggleDetails(id) {
-      const el = document.getElementById(id);
-      el.style.display = el.style.display === "block" ? "none" : "block";
-    }
-
-    fetchVideos();
-    setInterval(fetchVideos, 600000); // every 10 minutes
-  </script>
+  <h1>YouTube Video Tracker</h1>
+  <table id="videoTable">
+    <thead>
+      <tr><th>Thumbnail</th><th>Title</th><th>Date</th><th>Summary</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script src="app.js"></script>
 </body>
 </html>

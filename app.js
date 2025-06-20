@@ -1,75 +1,63 @@
+const tableBody = document.querySelector("#videoTable tbody");
 
-const tableContainer = document.getElementById("video-table");
-const lastUpdated = document.getElementById("last-updated");
+function createRow(video) {
+  const row = document.createElement("tr");
 
-async function fetchVideos() {
+  const thumb = document.createElement("td");
+  const img = document.createElement("img");
+  img.src = video.thumbnail;
+  img.style.width = "120px";
+  thumb.appendChild(img);
+
+  const title = document.createElement("td");
+  const link = document.createElement("a");
+  link.href = `https://www.youtube.com/watch?v=${video.videoId}`;
+  link.target = "_blank";
+  link.textContent = video.title;
+  title.appendChild(link);
+
+  const date = document.createElement("td");
+  date.textContent = new Date(video.publishedAt).toLocaleDateString();
+
+  const summaryCell = document.createElement("td");
+  const button = document.createElement("button");
+  button.textContent = "Show Summary";
+  const content = document.createElement("div");
+  content.className = "accordion-content";
+
+  button.addEventListener("click", async () => {
+    if (content.textContent === "") {
+      content.textContent = "Loading...";
+      const res = await fetch(`/api/summarizeTranscript?videoId=${video.videoId}`);
+      const data = await res.json();
+      content.textContent = data.summary || "No summary available.";
+    }
+    content.classList.toggle("active");
+  });
+
+  summaryCell.appendChild(button);
+  summaryCell.appendChild(content);
+
+  row.appendChild(thumb);
+  row.appendChild(title);
+  row.appendChild(date);
+  row.appendChild(summaryCell);
+
+  return row;
+}
+
+async function loadVideos() {
   try {
     const res = await fetch("/api/getVideos");
     const data = await res.json();
-    renderTable(data.videos);
-    updateTimestamp();
-  } catch (error) {
-    tableContainer.innerHTML = "<p>Failed to load videos.</p>";
+    tableBody.innerHTML = "";
+    data.forEach(video => {
+      tableBody.appendChild(createRow(video));
+    });
+  } catch (e) {
+    tableBody.innerHTML = "<tr><td colspan='4'>Failed to load videos</td></tr>";
   }
 }
 
-function renderTable(videos) {
-  const rows = videos.map(video => {
-    return `
-      <tr class="video-row">
-        <td>
-          <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">
-            <img src="${video.thumbnail}" width="120"/>
-          </a>
-        </td>
-        <td>
-          <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a>
-          <br />
-          <button onclick="toggleSummary('${video.videoId}', this)">Show Summary</button>
-          <div id="summary-${video.videoId}" class="summary-box" style="display:none;"></div>
-        </td>
-        <td>${video.publishedAt}</td>
-        <td>${video.duration}</td>
-        <td>${video.views}</td>
-        <td>${video.likes}</td>
-      </tr>`;
-  }).join("");
-
-  tableContainer.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Thumbnail</th>
-          <th>Title</th>
-          <th>Published</th>
-          <th>Duration</th>
-          <th>Views</th>
-          <th>Likes</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-}
-
-function updateTimestamp() {
-  const now = new Date();
-  lastUpdated.textContent = "Last updated: " + now.toLocaleString();
-}
-
-async function toggleSummary(videoId, btn) {
-  const box = document.getElementById("summary-" + videoId);
-  if (box.style.display === "none") {
-    box.innerHTML = "Loading summary...";
-    box.style.display = "block";
-    const res = await fetch("/api/summarizeTranscript?videoId=" + videoId);
-    const data = await res.json();
-    box.innerHTML = data.summary.replace(/\n/g, "<br>");
-    btn.textContent = "Hide Summary";
-  } else {
-    box.style.display = "none";
-    btn.textContent = "Show Summary";
-  }
-}
-
-fetchVideos();
-setInterval(fetchVideos, 10 * 60 * 1000); // Refresh every 10 mins
+loadVideos();
+setInterval(loadVideos, 10 * 60 * 1000); // every 10 minutes
