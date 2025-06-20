@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Channel Tracker</title>
-  <p id="last-updated" style="color: gray; font-size: 0.9em;"></p>
   <style>
-    body { background-color: #000; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border-bottom: 1px solid #444; }
-    img { max-width: 120px; }
+    body { background-color: black; color: white; font-family: sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { border-bottom: 1px solid #444; padding: 10px; text-align: left; }
+    th { background-color: #111; }
+    a { color: #00f; }
+    img { width: 120px; }
+    #hover-preview iframe { border: none; }
   </style>
 </head>
 <body>
   <h1>YouTube Channel Tracker</h1>
+  <p id="last-updated" style="color: gray; font-size: 0.9em;"></p>
   <table id="videos-table">
     <thead>
       <tr>
@@ -28,6 +32,18 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <div id="hover-preview" style="
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    pointer-events: none;
+    border: 2px solid #444;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  ">
+    <iframe width="320" height="180" allow="autoplay; encrypted-media" allowfullscreen src=""></iframe>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
