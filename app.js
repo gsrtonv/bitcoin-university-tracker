@@ -24,8 +24,8 @@ async function getLatestVideos() {
 
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><img src="${thumbnail}" alt="Thumbnail"></td>
-        <td>${title}</td>
+        <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank"><img src="${thumbnail}" alt="Thumbnail"></a></td>
+        <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">${title}</a></td>
         <td>${publishedAt}</td>
         <td>${description}</td>
         <td>${duration}</td>
