@@ -1,1 +1,0 @@
-// Function to send transcript to OpenAI for summary

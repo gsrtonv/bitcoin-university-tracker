@@ -1,3 +1,0 @@
-# bitcoin-university-tracker
-
-tbd
