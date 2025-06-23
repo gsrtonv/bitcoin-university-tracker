@@ -1,10 +1,13 @@
-
 {
   "routes": [
     {
       "route": "/api/*",
-      "methods": ["GET"],
-      "allowedRoles": ["anonymous"]
+      "methods": [
+        "GET"
+      ],
+      "allowedRoles": [
+        "anonymous"
+      ]
     }
   ],
   "navigationFallback": {
